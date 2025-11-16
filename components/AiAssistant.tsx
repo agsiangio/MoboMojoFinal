@@ -1,7 +1,38 @@
 import React, { useState } from 'react';
-import { AiSuggestion, generateSuggestions } from '../services/geminiService';
-import { Build } from '../types';
+import { AiSuggestion, AiSuggestionResponse, Build } from '../types';
+import { supabase } from '../services/supabase';
 import { CloseIcon, AiIcon } from './icons';
+
+// This function now lives inside the component file to ensure it's self-contained
+// and doesn't rely on a potentially problematic service file.
+const generateSuggestions = async (build: Build, currentPrice: number, budget?: number): Promise<AiSuggestionResponse> => {
+  if (!supabase) {
+    throw new Error("Supabase is not configured. Cannot call AI assistant.");
+  }
+
+  try {
+    // Securely call the Supabase Edge Function
+    const { data, error } = await supabase.functions.invoke('generate-suggestions', {
+      body: { build, currentPrice, budget },
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    // The Edge Function will return the structured JSON response directly
+    return data as AiSuggestionResponse;
+
+  } catch (error) {
+    console.error("Error calling Supabase Edge Function:", error);
+    // Provide a more user-friendly error message
+    if (error instanceof Error && error.message.includes('Function not found')) {
+      throw new Error("The AI Assistant is not set up correctly on the backend.");
+    }
+    throw new Error("Failed to communicate with the AI assistant.");
+  }
+};
+
 
 interface AiAssistantProps {
   build: Build;
@@ -28,7 +59,7 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ build, totalPrice, onClose, o
       setExplanation(result.explanation);
       setSuggestions(result.suggestions || []);
     } catch (err) {
-      setError('Failed to get suggestions from the AI assistant. Please try again later.');
+      setError(err instanceof Error ? err.message : 'An unknown error occurred. Please try again later.');
       console.error(err);
     } finally {
       setIsLoading(false);

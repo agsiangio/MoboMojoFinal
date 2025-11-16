@@ -63,3 +63,13 @@ export type SavedBuild = {
   createdAt: string; // Changed to string for Supabase timestamp
   totalPrice: number;
 };
+
+export interface AiSuggestion {
+  type: ComponentType;
+  name: string;
+}
+
+export interface AiSuggestionResponse {
+  explanation: string;
+  suggestions?: AiSuggestion[];
+}

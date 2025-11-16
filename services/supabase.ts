@@ -1,10 +1,12 @@
+// Fix: Add a triple-slash directive to include Vite client types. This defines `import.meta.env` for TypeScript, resolving the type error.
+/// <reference types="vite/client" />
+
 import { createClient, User } from '@supabase/supabase-js';
 import { Build, ComponentType, SavedBuild } from '../types';
 
-// IMPORTANT: In a real-world application, these keys should be stored in environment variables
-// and should not be hardcoded. The platform this code runs on is expected to provide these.
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
+// IMPORTANT: Switched from process.env to import.meta.env for Vite compatibility.
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Check if Supabase is configured. If not, we'll use Demo Mode.
 export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey && supabaseUrl !== "placeholder");
@@ -112,7 +114,8 @@ const mockDeleteBuild = async (buildId: string) => {
 
 // --- Real Supabase Implementation ---
 
-const supabase = isSupabaseConfigured ? createClient(supabaseUrl!, supabaseAnonKey!) : null;
+// Export the client so it can be used in other files (like geminiService)
+export const supabase = isSupabaseConfigured ? createClient(supabaseUrl!, supabaseAnonKey!) : null;
 
 // --- Exported Functions (Conditional) ---
 

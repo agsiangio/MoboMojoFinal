@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Build, Component, ComponentType } from '../types';
+import { Build, Component, ComponentType, AiSuggestion } from '../types';
 import { 
     CpuIcon, MotherboardIcon, RamIcon, GpuIcon, StorageIcon, PsuIcon, CaseIcon, CoolerIcon, WarningIcon, CheckCircleIcon, AiIcon, TrashIcon, SaveIcon, CloseIcon, InfoIcon
 } from '../components/icons';
@@ -10,7 +10,6 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { saveBuildToSupabase } from '../services/supabase';
-import { AiSuggestion } from '../services/geminiService';
 import { components as allComponents } from '../data/mockData';
 
 interface BuilderPageProps {
